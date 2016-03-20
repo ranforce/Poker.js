@@ -177,6 +177,7 @@
 				zindex : 100
 
 			}
+			canvas = vars.canvas;
 			if (window.Poker) {
 				$('select').bind('change', function() {
 					vars[$(this).attr('id').replace(/^sel/, '').toLowerCase()] = $(this).val();

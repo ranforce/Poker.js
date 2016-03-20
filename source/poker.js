@@ -9,6 +9,9 @@
 (function() {
 	'use strict';
 	if (window.CanvasRenderingContext2D) {
+		var cardDataCache = {
+
+		};
 		var symbolPath = {
 				'a': 'M6,200V183H23L58,0H78L117,183H131V200H85V183H97L92,156H46L42,183H54V200H6zM88,135L68,37L49,135H88z',
 				'2': 'M10,200L11,187C15,149,23,136,70,97C93,78,100,68,101,57C104,31,81,23,65,23C46,22,23,34,35,62L12,68C8,43,12,18,33,8C61,-6,96,-1,115,21C127,36,129,56,123,72C104,113,39,131,35,179H105V152H127V200L10,200z',
@@ -72,15 +75,77 @@
 		 *     canvas.drawPokerCard (0, 400, 100, 'hearts', 'O');
 		 *     canvas.drawPokerCard (0, 200, 100, 'd', 'Q');
 		 */
-		var cardCache = {
-
-		};
-		CanvasRenderingContext2D.prototype.drawPokerCard = function(x, y, size, suit, point) {
+		CanvasRenderingContext2D.prototype.drawPokerCard = function(x, y, size, suit, point, noCached) {
 			var self = this;
 			//			var tcanvas = document.createElement("canvas");
 			//			var ctx = tcanvas.getContext('2d');
-			var ctx = self;
+			//				var ctx = self;
+			var canvas = pc(size);
+			var ctx = canvas.getContext('2d');
 			var ax = function(n) {
+					//						return x + n * size / 200;
+					return 0 + n * size / 200;
+				},
+				ay = function(n) {
+					//						return y + n * size / 200;
+					return 0 + n * size / 200;
+				},
+				as = function(n) {
+					return n * size / 200;
+				};
+			var cardImage;
+			if (!noCached) {
+				cardImage = Poker.getCardImage(size, suit, point);
+			} else {
+				//			tcanvas.setAttribute("width", ax(150));
+				//			tcanvas.setAttribute("height", ay(200));
+				suit = fixSuit(suit);
+				point = fixSymbol(point);
+
+				ctx.drawEmptyCard(ax(0), ay(0), as(200));
+				ctx.fillStyle = (suit === 'h' || suit === 'd') ? '#a22' : '#000';
+				if (size >= 100) {
+					if (point !== 'o') {
+						ctx.fillPokerSymbol(ax(40), ay(65), as(70), suit);
+						ctx.fillPokerSymbol(ax(10), ay(10), as(40), point);
+						ctx.fillPokerSymbol(ax(11), ay(55), as(25), suit);
+						ctx.fillPokerSymbol(ax(140), ay(190), as(-40), point);
+						ctx.fillPokerSymbol(ax(139), ay(145), as(-25), suit);
+					} else {
+						ctx.fillPokerSymbol(ax(11), ay(10), as(18), 'o');
+						ctx.fillPokerSymbol(ax(139), ay(190), as(-18), 'o');
+						if (suit === 'h' || suit === 'd') {
+							ctx.drawPokerCrown(ax(38), ay(63), as(74), '#b55', '#a22');
+							ctx.drawPokerCrown(ax(40), ay(65), as(70), '#fdf98b', '#e7bd4f', '#a22');
+						} else {
+							ctx.drawPokerCrown(ax(38), ay(63), as(74), '#000', '#000');
+							ctx.drawPokerCrown(ax(40), ay(65), as(70), '#eee', '#888', '#333');
+						}
+					}
+				} else {
+					if (point !== 'o') {
+						ctx.fillPokerSymbol(ax(30), ay(75), as(100), suit);
+						ctx.fillPokerSymbol(ax(15), ay(15), as(50), point);
+					} else {
+						ctx.fillPokerSymbol(ax(11), ay(10), as(22), 'o');
+						if (suit === 'h' || suit === 'd') {
+							ctx.drawPokerCrown(ax(45), ay(73), as(89), '#b55', '#a22');
+							ctx.drawPokerCrown(ax(47), ay(75), as(85), '#fdf98b', '#e7bd4f', '#a22');
+						} else {
+							ctx.drawPokerCrown(ax(45), ay(73), as(89), '#000', '#000');
+							ctx.drawPokerCrown(ax(47), ay(75), as(85), '#eee', '#888', '#333');
+						}
+					}
+				}
+				//					cardImage = Poker.getCardImage(size, suit, point);
+				var src = canvas.toDataURL();
+				cardImage = document.createElement('img');
+				cardImage.src = src;
+				//			console.log(ax(0), ay(0), as(150), as(200));
+				//			var tdata = ctx.getImageData(ax(0), ay(0), as(150), as(200));
+				//			self.putImageData(tdata, ax(0), ay(0));
+			}
+			ax = function(n) {
 					return x + n * size / 200;
 				},
 				ay = function(n) {
@@ -89,50 +154,7 @@
 				as = function(n) {
 					return n * size / 200;
 				};
-
-			//			tcanvas.setAttribute("width", ax(150));
-			//			tcanvas.setAttribute("height", ay(200));
-			suit = fixSuit(suit);
-			point = fixSymbol(point);
-
-			ctx.drawEmptyCard(ax(0), ay(0), as(200));
-			ctx.fillStyle = (suit === 'h' || suit === 'd') ? '#a22' : '#000';
-			if (size >= 100) {
-				if (point !== 'o') {
-					ctx.fillPokerSymbol(ax(40), ay(65), as(70), suit);
-					ctx.fillPokerSymbol(ax(10), ay(10), as(40), point);
-					ctx.fillPokerSymbol(ax(11), ay(55), as(25), suit);
-					ctx.fillPokerSymbol(ax(140), ay(190), as(-40), point);
-					ctx.fillPokerSymbol(ax(139), ay(145), as(-25), suit);
-				} else {
-					ctx.fillPokerSymbol(ax(11), ay(10), as(18), 'o');
-					ctx.fillPokerSymbol(ax(139), ay(190), as(-18), 'o');
-					if (suit === 'h' || suit === 'd') {
-						ctx.drawPokerCrown(ax(38), ay(63), as(74), '#b55', '#a22');
-						ctx.drawPokerCrown(ax(40), ay(65), as(70), '#fdf98b', '#e7bd4f', '#a22');
-					} else {
-						ctx.drawPokerCrown(ax(38), ay(63), as(74), '#000', '#000');
-						ctx.drawPokerCrown(ax(40), ay(65), as(70), '#eee', '#888', '#333');
-					}
-				}
-			} else {
-				if (point !== 'o') {
-					ctx.fillPokerSymbol(ax(30), ay(75), as(100), suit);
-					ctx.fillPokerSymbol(ax(15), ay(15), as(50), point);
-				} else {
-					ctx.fillPokerSymbol(ax(11), ay(10), as(22), 'o');
-					if (suit === 'h' || suit === 'd') {
-						ctx.drawPokerCrown(ax(45), ay(73), as(89), '#b55', '#a22');
-						ctx.drawPokerCrown(ax(47), ay(75), as(85), '#fdf98b', '#e7bd4f', '#a22');
-					} else {
-						ctx.drawPokerCrown(ax(45), ay(73), as(89), '#000', '#000');
-						ctx.drawPokerCrown(ax(47), ay(75), as(85), '#eee', '#888', '#333');
-					}
-				}
-			}
-			console.log(ax(0), ay(0), as(150), as(200));
-			//			var tdata = ctx.getImageData(ax(0), ay(0), as(150), as(200));
-			//			self.putImageData(tdata, ax(0), ay(0));
+			self.drawImage(cardImage, ax(0), ay(0));
 		};
 
 		/**
@@ -493,9 +515,9 @@
 			 * @example
 			 *     document.body.appendChild(Poker.getCardCanvas(100, 'h', 'Q'));
 			 */
-			getCardCanvas: function(size, suit, point) {
+			getCardCanvas: function(size, suit, point, noCached) {
 				var canvas = pc(size);
-				canvas.getContext('2d').drawPokerCard(0, 0, size, suit, point);
+				canvas.getContext('2d').drawPokerCard(0, 0, size, suit, point, noCached);
 				return canvas;
 			},
 
@@ -515,7 +537,12 @@
 			 *     var imgData = Poker.getCardData(100, 'h', 'Q');
 			 */
 			getCardData: function(size, suit, point) {
-				return this.getCardCanvas(size, suit, point).toDataURL();
+				var cache = cardDataCache["" + size + "_" + suit + "_" + point];
+				if (typeof(cache) == "undefined") {
+					cache = this.getCardCanvas(size, suit, point, true).toDataURL();
+					cardDataCache["" + size + "_" + suit + "_" + point] = cache;
+				}
+				return cache;
 			},
 
 			/**
