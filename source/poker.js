@@ -6,9 +6,6 @@
  * @license MIT license source code.
  * @version 1.0
  */
-var cardDataCache = {
-
-};
 (function() {
 	'use strict';
 	if (window.CanvasRenderingContext2D) {
@@ -57,6 +54,9 @@ var cardDataCache = {
 				symbol = (symbol || 'o').toString().toLowerCase();
 				return symbol.substr((symbol.match(/jo|10|cr/)) ? 1 : 0, 1);
 			};
+		var cardDataCache = {
+
+		};
 
 		/**
 		 * Draw card number side
@@ -96,15 +96,15 @@ var cardDataCache = {
 			var cardImage = document.createElement('img');
 			var src;
 
-			console.log("cardDataCache", cardDataCache);
+			//			console.log("cardDataCache", cardDataCache);
 			var cacheKey = "_" + size + "_" + suit + "_" + point;
 			var cache = cardDataCache[cacheKey];
 			//			if (typeof(cache) == "undefined") {
 			//				cache = this.getCardCanvas(size, suit, point, true).toDataURL();
 			//				cardDataCache["" + size + "_" + suit + "_" + point] = cache;
 			//			}
-			console.log("cache", cache);
-			console.log(cardDataCache["_" + size + "_" + suit + "_" + point]);
+			//			console.log("cache", cache);
+			//			console.log(cardDataCache["_" + size + "_" + suit + "_" + point]);
 			if (cache) {
 				src = cache;
 			} else {
