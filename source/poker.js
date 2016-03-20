@@ -77,8 +77,9 @@
 		};
 		CanvasRenderingContext2D.prototype.drawPokerCard = function(x, y, size, suit, point) {
 			var self = this;
-			var tcanvas = document.createElement("canvas");
-			var ctx = tcanvas.getContext('2d');
+			//			var tcanvas = document.createElement("canvas");
+			//			var ctx = tcanvas.getContext('2d');
+			var ctx = self;
 			var ax = function(n) {
 					return x + n * size / 200;
 				},
@@ -89,8 +90,8 @@
 					return n * size / 200;
 				};
 
-			tcanvas.setAttribute("width", ax(150));
-			tcanvas.setAttribute("height", ay(200));
+			//			tcanvas.setAttribute("width", ax(150));
+			//			tcanvas.setAttribute("height", ay(200));
 			suit = fixSuit(suit);
 			point = fixSymbol(point);
 
@@ -130,8 +131,8 @@
 				}
 			}
 			console.log(ax(0), ay(0), as(150), as(200));
-			var tdata = ctx.getImageData(ax(0), ay(0), as(150), as(200));
-			self.putImageData(tdata, ax(0), ay(0));
+			//			var tdata = ctx.getImageData(ax(0), ay(0), as(150), as(200));
+			//			self.putImageData(tdata, ax(0), ay(0));
 		};
 
 		/**
