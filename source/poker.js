@@ -6,12 +6,12 @@
  * @license MIT license source code.
  * @version 1.0
  */
+var cardDataCache = {
+
+};
 (function() {
 	'use strict';
 	if (window.CanvasRenderingContext2D) {
-		var cardDataCache = {
-
-		};
 		var symbolPath = {
 				'a': 'M6,200V183H23L58,0H78L117,183H131V200H85V183H97L92,156H46L42,183H54V200H6zM88,135L68,37L49,135H88z',
 				'2': 'M10,200L11,187C15,149,23,136,70,97C93,78,100,68,101,57C104,31,81,23,65,23C46,22,23,34,35,62L12,68C8,43,12,18,33,8C61,-6,96,-1,115,21C127,36,129,56,123,72C104,113,39,131,35,179H105V152H127V200L10,200z',
@@ -75,7 +75,7 @@
 		 *     canvas.drawPokerCard (0, 400, 100, 'hearts', 'O');
 		 *     canvas.drawPokerCard (0, 200, 100, 'd', 'Q');
 		 */
-		CanvasRenderingContext2D.prototype.drawPokerCard = function(x, y, size, suit, point, noCached) {
+		CanvasRenderingContext2D.prototype.drawPokerCard = function(x, y, size, suit, point) {
 			var self = this;
 			//			var tcanvas = document.createElement("canvas");
 			//			var ctx = tcanvas.getContext('2d');
@@ -93,9 +93,20 @@
 				as = function(n) {
 					return n * size / 200;
 				};
-			var cardImage;
-			if (!noCached) {
-				cardImage = Poker.getCardImage(size, suit, point);
+			var cardImage = document.createElement('img');
+			var src;
+
+			console.log("cardDataCache", cardDataCache);
+			var cacheKey = "_" + size + "_" + suit + "_" + point;
+			var cache = cardDataCache[cacheKey];
+			//			if (typeof(cache) == "undefined") {
+			//				cache = this.getCardCanvas(size, suit, point, true).toDataURL();
+			//				cardDataCache["" + size + "_" + suit + "_" + point] = cache;
+			//			}
+			console.log("cache", cache);
+			console.log(cardDataCache["_" + size + "_" + suit + "_" + point]);
+			if (cache) {
+				src = cache;
 			} else {
 				//			tcanvas.setAttribute("width", ax(150));
 				//			tcanvas.setAttribute("height", ay(200));
@@ -139,8 +150,8 @@
 				}
 				//					cardImage = Poker.getCardImage(size, suit, point);
 				var src = canvas.toDataURL();
-				cardImage = document.createElement('img');
-				cardImage.src = src;
+				cache = src;
+				cardDataCache[cacheKey] = cache;
 				//			console.log(ax(0), ay(0), as(150), as(200));
 				//			var tdata = ctx.getImageData(ax(0), ay(0), as(150), as(200));
 				//			self.putImageData(tdata, ax(0), ay(0));
@@ -154,6 +165,7 @@
 				as = function(n) {
 					return n * size / 200;
 				};
+			cardImage.src = src;
 			self.drawImage(cardImage, ax(0), ay(0));
 		};
 
@@ -515,9 +527,9 @@
 			 * @example
 			 *     document.body.appendChild(Poker.getCardCanvas(100, 'h', 'Q'));
 			 */
-			getCardCanvas: function(size, suit, point, noCached) {
+			getCardCanvas: function(size, suit, point) {
 				var canvas = pc(size);
-				canvas.getContext('2d').drawPokerCard(0, 0, size, suit, point, noCached);
+				canvas.getContext('2d').drawPokerCard(0, 0, size, suit, point);
 				return canvas;
 			},
 
@@ -537,12 +549,7 @@
 			 *     var imgData = Poker.getCardData(100, 'h', 'Q');
 			 */
 			getCardData: function(size, suit, point) {
-				var cache = cardDataCache["" + size + "_" + suit + "_" + point];
-				if (typeof(cache) == "undefined") {
-					cache = this.getCardCanvas(size, suit, point, true).toDataURL();
-					cardDataCache["" + size + "_" + suit + "_" + point] = cache;
-				}
-				return cache;
+				return this.getCardCanvas(size, suit, point).toDataURL();
 			},
 
 			/**
